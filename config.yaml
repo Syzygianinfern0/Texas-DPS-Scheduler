@@ -1,0 +1,18 @@
+first_name: Karalexis
+last_name: Emerson
+dob: 08/021/2007 # mm/dd/yyyy
+last_4_ssn: 6949
+email: karalexisaemerson@gmail.com
+
+
+date: 08/01/2025 # mm/dd/yyyy
+time:
+  start: "08:00" # 24 hour format
+  end: "17:00" # 24 hour format
+
+type_id: 21 # 71 for first time, 81 for renewal
+
+zip_code: 78217
+miles_within: 50
+
+manual_mode: true # Set to true for manual login, false for automated
