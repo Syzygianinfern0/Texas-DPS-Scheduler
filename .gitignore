@@ -1,6 +1,7 @@
 # Mine
 auth_token.json
 config.yaml
+login_recording.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

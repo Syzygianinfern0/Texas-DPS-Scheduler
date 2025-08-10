@@ -31,7 +31,8 @@ def main():
         last_name=yaml_data["last_name"],
         dob=yaml_data["dob"],
         last_4_ssn=yaml_data["last_4_ssn"],
-        manual=yaml_data.get("manual_mode", True),
+        auth_mode=yaml_data.get("auth_mode", "manual"),
+        keystroke_file=yaml_data.get("keystroke_file", "login_recording.json"),
     )
 
     # Get current appointment info
