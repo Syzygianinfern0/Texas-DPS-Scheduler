@@ -24,7 +24,7 @@ class Authenticate:
         self.first_name = first_name
         self.last_name = last_name
         self.dob = dob
-        self.last_4_ssn = last_4_ssn
+        self.last_4_ssn = str(last_4_ssn)
         self.auth_mode = auth_mode  # "manual", "recorded_keystrokes", "automated_sendkeys"
         self.keystroke_file = keystroke_file
         self._load_token()
@@ -71,20 +71,8 @@ class Authenticate:
                     f"Keystroke file {self.keystroke_file} not found. Please record keystrokes first using keystroke_recorder.py"
                 )
         elif self.auth_mode == "automated_sendkeys":
-            # Click the language button
-            driver.find_element(By.TAG_NAME, "button").click()  # English button
-
-            # Fill details
-            inputs = driver.find_elements(By.TAG_NAME, "input")
-            inputs[1].send_keys(self.first_name)  # First Name
-            random_sleep()
-            inputs[2].send_keys(self.last_name)  # Last Name
-            random_sleep()
-            inputs[3].send_keys(self.dob)  # DOB
-            random_sleep()
-            inputs[4].send_keys(self.last_4_ssn)  # Last 4 SSN
-            random_sleep()
-            driver.find_elements(By.TAG_NAME, "button")[-1].click()  # Log on button
+            # Use human-like typing with Tab navigation and realistic timing
+            self._human_like_login(driver)
 
         auth_token = None
         # Extract the auth token from the request
@@ -118,6 +106,86 @@ class Authenticate:
 
         self.auth_token = auth_token
         self._save_token()
+
+    def _human_like_login(self, driver):
+        """Human-like login using keyboard navigation and natural timing."""
+        try:
+            # Focus the page body first (only focusing, not clicking)
+            body = driver.find_element(By.TAG_NAME, "body")
+            body.click()  # This is just to focus the page initially
+        except Exception:
+            pass
+
+        # Page settling delay
+        time.sleep(random.uniform(0.3, 0.8))
+
+        # Tab to language button
+        driver.switch_to.active_element.send_keys(Keys.TAB)
+        time.sleep(random.uniform(0.4, 0.7))
+
+        # Select English
+        driver.switch_to.active_element.send_keys(Keys.ENTER)
+        time.sleep(random.uniform(0.3, 0.6))
+
+        # Navigate to form fields
+        driver.switch_to.active_element.send_keys(Keys.TAB)
+        time.sleep(random.uniform(0.3, 0.6))
+        driver.switch_to.active_element.send_keys(Keys.TAB)
+        time.sleep(random.uniform(0.15, 0.35))
+        driver.switch_to.active_element.send_keys(Keys.TAB)
+        time.sleep(random.uniform(0.3, 0.55))
+        driver.switch_to.active_element.send_keys(Keys.TAB)
+        time.sleep(random.uniform(0.5, 0.8))
+
+        # Type first name
+        self._type_human_like(driver, self.first_name)
+
+        # Tab to last name
+        driver.switch_to.active_element.send_keys(Keys.TAB)
+        time.sleep(random.uniform(0.08, 0.18))
+
+        # Type last name
+        self._type_human_like(driver, self.last_name)
+
+        # Tab to DOB
+        driver.switch_to.active_element.send_keys(Keys.TAB)
+        time.sleep(random.uniform(0.18, 0.35))
+
+        # Type DOB
+        self._type_human_like(driver, self.dob)
+
+        # Tab to SSN
+        driver.switch_to.active_element.send_keys(Keys.TAB)
+        time.sleep(random.uniform(0.15, 0.3))
+
+        # Type SSN
+        self._type_human_like(driver, self.last_4_ssn)
+
+        # Tab to submit
+        driver.switch_to.active_element.send_keys(Keys.TAB)
+        time.sleep(random.uniform(0.15, 0.3))
+
+        # Submit form
+        driver.switch_to.active_element.send_keys(Keys.ENTER)
+        time.sleep(random.uniform(0.25, 0.4))
+
+    def _type_human_like(self, driver, text):
+        """Type text character by character with human-like timing."""
+        for i, char in enumerate(text):
+            if char.isupper():
+                driver.switch_to.active_element.send_keys(char)
+                delay = random.uniform(0.08, 0.32)
+            elif char.isdigit():
+                driver.switch_to.active_element.send_keys(char)
+                delay = random.uniform(0.13, 0.31)
+            elif char == " ":
+                driver.switch_to.active_element.send_keys(char)
+                delay = 0.05
+            else:
+                driver.switch_to.active_element.send_keys(char)
+                delay = random.uniform(0.08, 0.19)
+
+            time.sleep(delay)
 
     def get_headers(self, reauth=False):
         if reauth:
