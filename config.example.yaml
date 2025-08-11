@@ -16,8 +16,8 @@ type_id: 81 # 71 for first time, 81 for renewal
 zip_code: 12345
 miles_within: 10
 
-auth_mode: manual # Options: manual, recorded_keystrokes, automated_sendkeys
-keystroke_file: login_recording.json # File to save/load recorded keystrokes
+auth_mode: automated_sendkeys # Options: automated_sendkeys (recommended), recorded_keystrokes, manual
+keystroke_file: login_recording.json # File to save/load recorded keystrokes. Only used if auth_mode is recorded_keystrokes.
 
 # Notification settings
 notifications:
