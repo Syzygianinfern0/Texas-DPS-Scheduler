@@ -1,2 +1,4 @@
 apprise
+blinker==1.7.0
+pynput
 selenium-wire
