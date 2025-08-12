@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 
 import requests
 import urllib3
@@ -12,12 +12,29 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 def main():
     yaml_data = yaml.safe_load(open("config.yaml"))
 
-    # Extract date and time
-    date_str = yaml_data["date"]
+    # Extract date range and time
+    start_date_str = yaml_data["date"]["start"]
+    end_date_str = yaml_data["date"]["end"]
     start_time_str = yaml_data["time"]["start"]
     end_time_str = yaml_data["time"]["end"]
-    needed_start_dt = datetime.strptime(f"{date_str} {start_time_str}", "%m/%d/%Y %H:%M")
-    needed_end_dt = datetime.strptime(f"{date_str} {end_time_str}", "%m/%d/%Y %H:%M")
+
+    # Parse dates and times separately
+    start_date = datetime.strptime(start_date_str, "%m/%d/%Y").date()
+    end_date = datetime.strptime(end_date_str, "%m/%d/%Y").date()
+    start_time = datetime.strptime(start_time_str, "%H:%M").time()
+    end_time = datetime.strptime(end_time_str, "%H:%M").time()
+
+    def is_within_date_time_range(slot_datetime):
+        """Check if a datetime falls within the specified date range and time range on any day."""
+        slot_date = slot_datetime.date()
+        slot_time = slot_datetime.time()
+
+        # Check if date is within range
+        if not (start_date <= slot_date <= end_date):
+            return False
+
+        # Check if time is within range on that day
+        return start_time <= slot_time <= end_time
 
     json_data = {
         "TypeId": yaml_data["type_id"],
@@ -31,7 +48,8 @@ def main():
         last_name=yaml_data["last_name"],
         dob=yaml_data["dob"],
         last_4_ssn=yaml_data["last_4_ssn"],
-        manual=yaml_data.get("manual_mode", True),
+        auth_mode=yaml_data.get("auth_mode", "manual"),
+        keystroke_file=yaml_data.get("keystroke_file", "login_recording.json"),
     )
 
     # Get current appointment info
@@ -60,8 +78,8 @@ def main():
     if len(current_booking) > 0:  # There is a current appointment
         current_booking = current_booking[0]["BookingDateTime"]  # 2024-10-21T15:20:00
         current_booking = datetime.strptime(current_booking, "%Y-%m-%dT%H:%M:%S")  # 2024-10-21 15:20:00
-        # Check if the current appointment already satisfies the required dt
-        if needed_start_dt <= current_booking <= needed_end_dt:
+        # Check if the current appointment already satisfies the required date/time range
+        if is_within_date_time_range(current_booking):
             print("Current appointment is within the specified date and time range")
             return
 
@@ -108,7 +126,8 @@ def main():
         for date_info in timeslots["LocationAvailabilityDates"]:
             for available_slot in date_info["AvailableTimeSlots"]:
                 slot_start_dt = datetime.strptime(available_slot["StartDateTime"], "%Y-%m-%dT%H:%M:%S")
-                if needed_start_dt <= slot_start_dt <= needed_end_dt:
+                # Check if slot falls within the date range and time range (same time window every day)
+                if is_within_date_time_range(slot_start_dt):
                     slot = available_slot
                     slot_id = slot["SlotId"]
                     print(f"Found a slot: {slot['StartDateTime']} at {location['Name']}")

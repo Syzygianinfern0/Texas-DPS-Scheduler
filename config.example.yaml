@@ -4,10 +4,11 @@ dob: 01/01/2000 # mm/dd/yyyy
 last_4_ssn: 9999
 email: john.doe@gmail.com
 
-
-date: 12/31/2024 # mm/dd/yyyy
+date:
+  start: 08/10/2025 # mm/dd/yyyy - start of date range
+  end: 08/17/2025 # mm/dd/yyyy - end of date range (inclusive)
 time:
-  start: "15:00" # 24 hour format
+  start: "08:00" # 24 hour format
   end: "17:00" # 24 hour format
 
 type_id: 81 # 71 for first time, 81 for renewal
@@ -15,4 +16,17 @@ type_id: 81 # 71 for first time, 81 for renewal
 zip_code: 12345
 miles_within: 10
 
-manual_mode: true # Set to true for manual login, false for automated
+auth_mode: automated_sendkeys # Options: automated_sendkeys (recommended), recorded_keystrokes, manual
+keystroke_file: login_recording.json # File to save/load recorded keystrokes. Only used if auth_mode is recorded_keystrokes.
+
+# Notification settings
+notifications:
+  # Apprise notification URLs - add your notification services here
+  # Examples:
+  # - "tgram://bot-token/chat-id/"  # Telegram
+  # - "mailto://user:pass@gmail.com"  # Email
+  # - "discord://webhook_id/webhook_token"  # Discord
+  # - "slack://token/channel"  # Slack
+  urls:
+    []
+    # - "tgram://your-bot-token/your-chat-id/"

@@ -4,9 +4,35 @@ import subprocess
 import time
 
 import apprise
+import yaml
 
-apobj = apprise.Apprise()
-# apobj.add("tgram://bot-token/chat-id/")
+
+def load_apprise_config():
+    """Load Apprise configuration from config.yaml"""
+    try:
+        with open("config.yaml", "r") as file:
+            config = yaml.safe_load(file)
+
+        apobj = apprise.Apprise()
+
+        # Load notification URLs from config
+        notification_urls = config.get("notifications", {}).get("urls", [])
+        for url in notification_urls:
+            if url:  # Skip empty/None URLs
+                apobj.add(url)
+
+        return apobj
+    except FileNotFoundError:
+        logging.warning("config.yaml not found. Using default Apprise configuration.")
+        return apprise.Apprise()
+    except Exception as e:
+        logging.error(f"Error loading Apprise configuration: {e}")
+        return apprise.Apprise()
+
+
+# Initialize Apprise with configuration from YAML
+apobj = load_apprise_config()
+
 
 def run_command(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
