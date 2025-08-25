@@ -18,7 +18,7 @@ cd Texas-DPS-Scheduler
 4. Run the following commands
 
 ```script
-pip install requirements.txt
+pip install -r requirements.txt
 ./run.sh
 ```
 
